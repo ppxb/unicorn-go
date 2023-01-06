@@ -1,0 +1,24 @@
+package global
+
+import (
+	"github.com/go-sql-driver/mysql"
+)
+
+type Configuration struct {
+	Server ServerConfiguration `mapstructure:"server" json:"server"`
+	Mysql  MysqlConfiguration  `mapstructure:"mysql" json:"mysql"`
+}
+
+type ServerConfiguration struct {
+	Host           string `mapstructure:"host" json:"host"`
+	Port           int    `mapstructure:"port" json:"port"`
+	ApiVersion     string `mapstructure:"api-version" json:"apiVersion"`
+	ConnectTimeout int    `mapstructure:"connect-timeout" json:"connectTimeout"`
+}
+
+type MysqlConfiguration struct {
+	Uri         string       `mapstructure:"uri" json:"uri"`
+	TablePrefix string       `mapstructure:"table-prefix" json:"tablePrefix"`
+	ShowSql     bool         `mapstructure:"show-sql" json:"showSql"`
+	DSN         mysql.Config `json:"-"`
+}

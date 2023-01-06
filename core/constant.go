@@ -2,7 +2,7 @@ package core
 
 const (
 	// Config File
-	ConfigDefaultFile = "config.yml"
+	ConfigDefaultFile = "config.debug.yml"
 	ConfigTestFile    = "config.test.yml"
 	ConfigReleaseFile = "config.release.yml"
 )

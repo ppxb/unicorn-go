@@ -1,11 +1,16 @@
 package main
 
 import (
+	"context"
+	"embed"
 	"fmt"
-	"github.com/ppxb/unicorn/core"
 	"github.com/ppxb/unicorn/initialize"
-	"github.com/ppxb/unicorn/pkg/server"
 )
+
+//go:embed conf
+var conf embed.FS
+
+var ctx = context.Background()
 
 func main() {
 	defer func() {
@@ -14,9 +19,6 @@ func main() {
 		}
 	}()
 
-	core.InitViper()
-	initialize.Gorm()
-	router := initialize.Router()
-
-	server.Http(router)
+	initialize.Config(ctx, conf)
+	initialize.Mysql()
 }
