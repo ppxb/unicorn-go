@@ -7,6 +7,7 @@ import (
 type Configuration struct {
 	Server ServerConfiguration `mapstructure:"server" json:"server"`
 	Mysql  MysqlConfiguration  `mapstructure:"mysql" json:"mysql"`
+	Redis  RedisConfiguration  `mapstructure:"redis" json:"redis"`
 }
 
 type ServerConfiguration struct {
@@ -22,4 +23,8 @@ type MysqlConfiguration struct {
 	TablePrefix string       `mapstructure:"table-prefix" json:"tablePrefix"`
 	ShowSql     bool         `mapstructure:"show-sql" json:"showSql"`
 	DSN         mysql.Config `json:"-"`
+}
+
+type RedisConfiguration struct {
+	Uri string `mapstructure:"uri" json:"uri"`
 }

@@ -19,7 +19,7 @@ var sqlFs embed.FS
 func Mysql() {
 	cfg, err := m.ParseDSN(global.Config.Mysql.Uri)
 	if err != nil {
-		panic(errors.Wrap(err, "初始化数据库失败"))
+		panic(errors.Wrap(err, "初始化Mysql失败"))
 	}
 	global.Config.Mysql.DSN = *cfg
 
@@ -29,10 +29,10 @@ func Mysql() {
 		migrate.WithBefore(beforeMigrate),
 	)
 	if err != nil {
-		panic(errors.Wrap(err, "初始化数据库失败"))
+		panic(errors.Wrap(err, "初始化Mysql失败"))
 	}
 
-	fmt.Println("初始化数据库成功")
+	fmt.Println("初始化Mysql成功")
 }
 
 func beforeMigrate(ctx context.Context) (err error) {

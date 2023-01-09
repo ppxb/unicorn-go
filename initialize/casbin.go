@@ -12,14 +12,14 @@ import (
 func CasbinEnforcer() {
 	e, err := mysqlCasbin()
 	if err != nil {
-		panic(errors.Wrap(err, "initialize casbin enforcer failed"))
+		panic(errors.Wrap(err, "初始化Casbin Enforcer失败"))
 	}
 	global.CasbinEnforcer = e
-	fmt.Println("初始化casbin成功")
+	fmt.Println("初始化Casbin成功")
 }
 
 func mysqlCasbin() (e *casbin.Enforcer, err error) {
-	a, err := gormadapter.NewAdapterByDBUseTableName(
+	adapter, err := gormadapter.NewAdapterByDBUseTableName(
 		global.Mysql.WithContext(ctx),
 		global.Config.Mysql.TablePrefix,
 		"sys_casbin",
@@ -35,7 +35,7 @@ func mysqlCasbin() (e *casbin.Enforcer, err error) {
 		return
 	}
 
-	e, err = casbin.NewEnforcer(casbinModel, a)
+	e, err = casbin.NewEnforcer(casbinModel, adapter)
 	if err != nil {
 		return
 	}

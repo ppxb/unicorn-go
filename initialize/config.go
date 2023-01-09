@@ -51,7 +51,7 @@ func Config(c context.Context, conf embed.FS) {
 	}
 
 	if err := v.Unmarshal(&global.Config); err != nil {
-		panic(errors.Wrapf(err, "初始化配置文件失败"))
+		panic(errors.Wrapf(err, "初始化Config失败"))
 	}
 
 	if global.Config.Server.ConnectTimeout < 1 {
@@ -62,16 +62,16 @@ func Config(c context.Context, conf embed.FS) {
 		global.Config.Server.ApiVersion = "v1"
 	}
 
-	fmt.Println("初始化配置文件成功")
+	fmt.Println("初始化Config成功")
 }
 
 func readConfig(box ms.ConfBox, v *viper.Viper, configFile string) {
 	v.SetConfigType(configType)
 	config := box.Get(configFile)
 	if len(config) == 0 {
-		panic(fmt.Sprintf("初始化配置文件失败, 配置文件路径：%s", box.Dir))
+		panic(fmt.Sprintf("初始化Config失败, 配置文件路径：%s", box.Dir))
 	}
 	if err := v.ReadConfig(bytes.NewReader(config)); err != nil {
-		panic(errors.Wrapf(err, "初始化配置文件失败, 配置文件路径：%s`", box.Dir))
+		panic(errors.Wrapf(err, "初始化Config失败, 配置文件路径：%s`", box.Dir))
 	}
 }

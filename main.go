@@ -26,6 +26,7 @@ func main() {
 	global.RuntimeRoot = strings.TrimSuffix(file, "main.go")
 
 	initialize.Config(ctx, conf)
+	initialize.Redis()
 	initialize.Mysql()
 	initialize.CasbinEnforcer()
 }
