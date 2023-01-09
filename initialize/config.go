@@ -5,42 +5,49 @@ import (
 	"context"
 	"embed"
 	"fmt"
+	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/ppxb/unicorn/pkg/global"
+	"github.com/ppxb/unicorn/pkg/ms"
 	"github.com/spf13/viper"
 	"strings"
 )
 
 const (
 	configType            = "yaml"
-	debugConfig           = "conf/config.debug.yml"
-	testConfig            = "conf/config.test.yml"
-	releaseConfig         = "conf/config.release.yml"
+	configDir             = "conf"
+	debugConfig           = "config.debug.yml"
+	testConfig            = "config.test.yml"
+	releaseConfig         = "config.release.yml"
 	defaultConnectTimeout = 5
 )
 
 var ctx context.Context
 
 func Config(c context.Context, conf embed.FS) {
-	var config string
+	var configFile string
+	var box ms.ConfBox
 
 	ctx = c
-	switch global.ProjectEnv {
-	case "debug":
-		config = debugConfig
-	case "release":
-		config = releaseConfig
+	box.Ctx = ctx
+	box.Fs = conf
+	box.Dir = configDir
+	global.ConfBox = box
+
+	switch gin.Mode() {
+	case gin.TestMode:
+		configFile = testConfig
+	case gin.ReleaseMode:
+		configFile = releaseConfig
 	default:
-		config = debugConfig
+		configFile = debugConfig
 	}
 
-	fmt.Printf("项目环境为：%s，配置文件为：%s \n", global.ProjectEnv, config)
-
 	v := viper.New()
-	v.SetConfigType(configType)
-	v.SetConfigFile(config)
-	if err := v.ReadConfig(bytes.NewReader(readConfig(conf, config))); err != nil {
-		panic(fmt.Errorf("读取配置文件失败：%s", err.Error()))
+	readConfig(box, v, configFile)
+	settings := v.AllSettings()
+	for i, s := range settings {
+		v.SetDefault(i, s)
 	}
 
 	if err := v.Unmarshal(&global.Config); err != nil {
@@ -54,13 +61,17 @@ func Config(c context.Context, conf embed.FS) {
 	if strings.TrimSpace(global.Config.Server.ApiVersion) == "" {
 		global.Config.Server.ApiVersion = "v1"
 	}
+
+	fmt.Println("初始化配置文件成功")
 }
 
-func readConfig(fs embed.FS, config string) (bs []byte) {
-	var err error
-	bs, err = fs.ReadFile(config)
-	if err != nil {
-		fmt.Printf("读取文件错误,err:%s \n", err.Error())
+func readConfig(box ms.ConfBox, v *viper.Viper, configFile string) {
+	v.SetConfigType(configType)
+	config := box.Get(configFile)
+	if len(config) == 0 {
+		panic(fmt.Sprintf("初始化配置文件失败, 配置文件路径：%s", box.Dir))
 	}
-	return
+	if err := v.ReadConfig(bytes.NewReader(config)); err != nil {
+		panic(errors.Wrapf(err, "初始化配置文件失败, 配置文件路径：%s`", box.Dir))
+	}
 }

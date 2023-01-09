@@ -5,6 +5,9 @@ import (
 	"embed"
 	"fmt"
 	"github.com/ppxb/unicorn/initialize"
+	"github.com/ppxb/unicorn/pkg/global"
+	"runtime"
+	"strings"
 )
 
 //go:embed conf
@@ -19,6 +22,10 @@ func main() {
 		}
 	}()
 
+	_, file, _, _ := runtime.Caller(0)
+	global.RuntimeRoot = strings.TrimSuffix(file, "main.go")
+
 	initialize.Config(ctx, conf)
 	initialize.Mysql()
+	initialize.CasbinEnforcer()
 }

@@ -1,9 +1,16 @@
 package global
 
-import "gorm.io/gorm"
+import (
+	"github.com/casbin/casbin/v2"
+	"github.com/ppxb/unicorn/pkg/ms"
+	"gorm.io/gorm"
+)
 
 var (
-	Mode   string
-	Config Configuration
-	Mysql  *gorm.DB
+	Mode           string
+	RuntimeRoot    string
+	Config         Configuration
+	ConfBox        ms.ConfBox
+	Mysql          *gorm.DB
+	CasbinEnforcer *casbin.Enforcer
 )

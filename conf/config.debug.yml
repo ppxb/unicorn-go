@@ -2,6 +2,7 @@ server:
   host: localhost
   port: 8848
   connect-timeout: 10
+  casbin-model-path: rbac_model.conf
 
 mysql:
   uri: root:123456@tcp(127.0.0.1:3307)/test?charset=utf8mb4&collation=utf8mb4_general_ci&parseTime=True&loc=Local&timeout=10000ms
