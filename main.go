@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"github.com/ppxb/unicorn/initialize"
 	"github.com/ppxb/unicorn/pkg/global"
+	"github.com/ppxb/unicorn/pkg/server"
 	"runtime"
 	"strings"
 )
@@ -29,4 +30,10 @@ func main() {
 	initialize.Redis()
 	initialize.Mysql()
 	initialize.CasbinEnforcer()
+
+	server.Listen(
+		server.WithHttpCtx(ctx),
+		server.WithHttpHost(global.Config.Server.Host),
+		server.WithHttpPort(global.Config.Server.Port),
+	)
 }
