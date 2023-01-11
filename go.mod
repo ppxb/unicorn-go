@@ -11,6 +11,7 @@ require (
 	github.com/hibiken/asynq v0.24.0
 	github.com/pkg/errors v0.9.1
 	github.com/spf13/viper v1.14.0
+	github.com/thoas/go-funk v0.9.3
 	gorm.io/driver/mysql v1.4.5
 	gorm.io/gorm v1.24.3
 )

@@ -7,6 +7,7 @@ import (
 	"github.com/ppxb/unicorn/initialize"
 	"github.com/ppxb/unicorn/pkg/global"
 	"github.com/ppxb/unicorn/pkg/server"
+	"github.com/ppxb/unicorn/router"
 	"runtime"
 	"strings"
 )
@@ -35,5 +36,6 @@ func main() {
 		server.WithHttpCtx(ctx),
 		server.WithHttpHost(global.Config.Server.Host),
 		server.WithHttpPort(global.Config.Server.Port),
+		server.WithHttpHandler(router.InitRouter(ctx)),
 	)
 }

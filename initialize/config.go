@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/ppxb/unicorn/pkg/global"
-	"github.com/ppxb/unicorn/pkg/ms"
+	"github.com/ppxb/unicorn/pkg/model"
 	"github.com/spf13/viper"
 	"strings"
 )
@@ -26,7 +26,7 @@ var ctx context.Context
 
 func Config(c context.Context, conf embed.FS) {
 	var configFile string
-	var box ms.ConfBox
+	var box model.ConfBox
 
 	ctx = c
 	box.Ctx = ctx
@@ -58,6 +58,10 @@ func Config(c context.Context, conf embed.FS) {
 		global.Config.Server.ConnectTimeout = defaultConnectTimeout
 	}
 
+	if strings.TrimSpace(global.Config.Server.ApiPrefix) == "" {
+		global.Config.Server.ApiPrefix = "api"
+	}
+
 	if strings.TrimSpace(global.Config.Server.ApiVersion) == "" {
 		global.Config.Server.ApiVersion = "v1"
 	}
@@ -65,7 +69,7 @@ func Config(c context.Context, conf embed.FS) {
 	fmt.Println("初始化Config成功")
 }
 
-func readConfig(box ms.ConfBox, v *viper.Viper, configFile string) {
+func readConfig(box model.ConfBox, v *viper.Viper, configFile string) {
 	v.SetConfigType(configType)
 	config := box.Get(configFile)
 	if len(config) == 0 {
