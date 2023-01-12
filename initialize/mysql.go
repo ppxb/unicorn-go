@@ -14,6 +14,7 @@ import (
 	"time"
 )
 
+//go:embed db/*.sql
 var sqlFs embed.FS
 
 func Mysql() {
@@ -26,6 +27,8 @@ func Mysql() {
 	err = migrate.WithHooks(
 		migrate.WithCtx(ctx),
 		migrate.WithUri(global.Config.Mysql.Uri),
+		migrate.WithFs(sqlFs),
+		migrate.WithFsRoot("db"),
 		migrate.WithBefore(beforeMigrate),
 	)
 	if err != nil {

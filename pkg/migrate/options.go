@@ -33,6 +33,19 @@ func WithDriver(s string) func(*Options) {
 	}
 }
 
+// WithFs set database go embed file
+func WithFs(fs embed.FS) func(*Options) {
+	return func(options *Options) {
+		getOptionsOrSetDefault(options).fs = fs
+	}
+}
+
+func WithFsRoot(s string) func(*Options) {
+	return func(options *Options) {
+		getOptionsOrSetDefault(options).fsRoot = s
+	}
+}
+
 // WithUri set datasource uri
 func WithUri(s string) func(*Options) {
 	return func(options *Options) {
