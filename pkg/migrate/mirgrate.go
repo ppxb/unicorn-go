@@ -156,6 +156,6 @@ func status(ops *Options, db *sql.DB, source *migrate.EmbedFileSystemMigrationSo
 		}
 	}
 
-	fmt.Printf("[数据库] 迁移状态：等待中 %d，已接收 %d \n", len(pending), len(applied))
+	fmt.Printf("[数据库] 迁移状态：等待中 %d，已成功 %d \n", len(pending), len(applied))
 	return
 }

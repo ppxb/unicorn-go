@@ -43,7 +43,6 @@ func InitRouter(ctx context.Context) *gin.Engine {
 		WithJwt(true),
 	)
 
-	// register routes
 	InitUserRouter(nr)
 
 	fmt.Println("[初始化] Router成功")
