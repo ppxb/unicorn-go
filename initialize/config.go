@@ -66,7 +66,7 @@ func Config(c context.Context, conf embed.FS) {
 		global.Config.Server.ApiVersion = "v1"
 	}
 
-	fmt.Println("初始化Config成功")
+	fmt.Println("[初始化] Config成功")
 }
 
 func readConfig(box model.ConfBox, v *viper.Viper, configFile string) {

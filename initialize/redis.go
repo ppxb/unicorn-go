@@ -24,7 +24,7 @@ func Redis() {
 			select {
 			case <-ctx.Done():
 				if !init {
-					panic(fmt.Sprintf("初始化Redis失败: 连接超时(%ds)", global.Config.Server.ConnectTimeout))
+					panic(fmt.Sprintf("[初始化] Redis失败: 连接超时(%ds)", global.Config.Server.ConnectTimeout))
 				}
 				return
 			}
@@ -33,15 +33,15 @@ func Redis() {
 
 	client, err := query.ParseRedisUri(global.Config.Redis.Uri)
 	if err != nil {
-		panic(errors.Wrap(err, "初始化Redis失败"))
+		panic(errors.Wrap(err, "[初始化] Redis失败"))
 	}
 
 	err = client.Ping(ctx).Err()
 	if err != nil {
-		panic(errors.Wrap(err, "初始化Redis失败"))
+		panic(errors.Wrap(err, "[初始化] Redis失败"))
 	}
 	global.Redis = client
 
 	init = true
-	fmt.Println("初始化Redis成功")
+	fmt.Println("[初始化] Redis成功")
 }

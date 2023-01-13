@@ -22,7 +22,7 @@ func WithHooks(options ...func(*Options)) (err error) {
 	var db *sql.DB
 	db, err = sql.Open(ops.driver, ops.uri)
 	if err != nil {
-		fmt.Println(errors.Wrap(err, "打开数据库连接失败"))
+		fmt.Println(errors.Wrap(err, "[数据库] 打开数据库连接失败"))
 		return
 	}
 
@@ -42,14 +42,14 @@ func WithHooks(options ...func(*Options)) (err error) {
 		if lockAcquired {
 			break
 		} else {
-			fmt.Println("无法获得锁，正在重试")
+			fmt.Println("[数据库] 无法获得锁，正在重试")
 		}
 	}
 
 	if ops.before != nil {
 		err = ops.before(ops.ctx)
 		if err != nil {
-			fmt.Println(errors.Wrap(err, "执行before hook失败"))
+			fmt.Println(errors.Wrap(err, "[数据库] 执行before hook失败"))
 			return
 		}
 	}
@@ -59,7 +59,19 @@ func WithHooks(options ...func(*Options)) (err error) {
 		FileSystem: ops.fs,
 		Root:       ops.fsRoot,
 	}
-	err = status
+	err = status(ops, db, source)
+	if err != nil {
+		fmt.Println("[数据库] 显示迁移状态失败")
+		return
+	}
+
+	_, err = migrate.Exec(db, ops.driver, source, migrate.Up)
+	if err != nil {
+		fmt.Println("[数据库] 迁移失败")
+		return
+	}
+
+	fmt.Println("[数据库] 迁移成功")
 	return
 }
 
@@ -69,7 +81,7 @@ func database(ops *Options) (err error) {
 
 	cfg, err = m.ParseDSN(ops.uri)
 	if err != nil {
-		fmt.Println(errors.Wrap(err, "无效的数据库uri"))
+		fmt.Println(errors.Wrap(err, "[数据库] 无效的数据库uri"))
 		return
 	}
 
@@ -82,7 +94,7 @@ func database(ops *Options) (err error) {
 
 	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbname))
 	if err != nil {
-		fmt.Println(errors.Wrap(err, "创建数据库失败"))
+		fmt.Println(errors.Wrap(err, "[数据库] 创建数据库失败"))
 	}
 	return
 }
@@ -92,11 +104,11 @@ func releaseLock(ops *Options, db *sql.DB) (err error) {
 	_, err = db.Exec(q)
 
 	if err != nil {
-		fmt.Println("数据库迁移互斥锁释放失败")
+		fmt.Println("[数据库] 锁释放失败")
 		return
 	}
 
-	fmt.Println("数据库迁移互斥锁释放成功")
+	fmt.Println("[数据库] 锁释放成功")
 	return
 }
 
@@ -105,9 +117,9 @@ func acquireLock(ops *Options, db *sql.DB) (f bool, err error) {
 	err = db.QueryRow(q).Scan(&f)
 
 	if err != nil {
-		fmt.Println("数据库迁移申请互斥锁失败")
+		fmt.Println("[数据库] 申请互斥锁失败")
 	}
-	fmt.Println("数据库迁移申请互斥锁成功")
+	fmt.Println("[数据库] 申请互斥锁成功")
 	return
 }
 
@@ -115,14 +127,14 @@ func status(ops *Options, db *sql.DB, source *migrate.EmbedFileSystemMigrationSo
 	var migrations []*migrate.Migration
 	migrations, err = source.FindMigrations()
 	if err != nil {
-		fmt.Println("没有找到数据库迁移文件")
+		fmt.Println("[数据库] 没有找到数据库迁移文件")
 		return
 	}
 
 	var records []*migrate.MigrationRecord
 	records, err = migrate.GetMigrationRecords(db, ops.driver)
 	if err != nil {
-		fmt.Println("没有找到数据库迁移历史")
+		fmt.Println("[数据库] 没有找到数据库迁移历史")
 		return
 	}
 	rows := make(map[string]bool)
@@ -136,4 +148,14 @@ func status(ops *Options, db *sql.DB, source *migrate.EmbedFileSystemMigrationSo
 		rows[item.Id] = true
 	}
 
+	for i, l := 0, len(migrations); i < l; i++ {
+		if !rows[migrations[i].Id] {
+			pending = append(pending, migrations[i].Id)
+		} else {
+			applied = append(applied, migrations[i].Id)
+		}
+	}
+
+	fmt.Printf("[数据库] 迁移状态：等待中 %d，已接收 %d \n", len(pending), len(applied))
+	return
 }

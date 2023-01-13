@@ -27,11 +27,11 @@ func Listen(options ...func(*HttpOptions)) {
 
 	go func() {
 		if err := srv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
-			fmt.Println("服务器启动失败")
+			fmt.Println("[服务器] 启动失败")
 		}
 	}()
 
-	fmt.Printf("服务器启动成功，监听在：http://%s:%d/%s \n", host, port, ops.urlPrefix)
+	fmt.Printf("[服务器] 启动成功，监听在：http://%s:%d/%s \n", host, port, ops.urlPrefix)
 
 	quit := make(chan os.Signal, 0)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
@@ -39,13 +39,13 @@ func Listen(options ...func(*HttpOptions)) {
 	if ops.exit != nil {
 		ops.exit()
 	}
-	fmt.Println("服务器关闭中")
+	fmt.Println("[服务器] 关闭中")
 
 	_, cancel := context.WithTimeout(ctx, 5*time.Second)
 	defer cancel()
 	if err := srv.Shutdown(ops.ctx); err != nil {
-		fmt.Println(errors.Wrap(err, "服务器关闭失败"))
+		fmt.Println(errors.Wrap(err, "[服务器] 关闭失败"))
 	}
 
-	fmt.Println("服务器已关闭")
+	fmt.Println("[服务器] 已关闭")
 }

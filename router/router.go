@@ -46,7 +46,7 @@ func InitRouter(ctx context.Context) *gin.Engine {
 	// register routes
 	InitUserRouter(nr)
 
-	fmt.Println("初始化router成功")
+	fmt.Println("[初始化] Router成功")
 
 	return r
 }

@@ -12,10 +12,10 @@ import (
 func CasbinEnforcer() {
 	e, err := mysqlCasbin()
 	if err != nil {
-		panic(errors.Wrap(err, "初始化Casbin Enforcer失败"))
+		panic(errors.Wrap(err, "[初始化] Casbin Enforcer失败"))
 	}
 	global.CasbinEnforcer = e
-	fmt.Println("初始化Casbin成功")
+	fmt.Println("[初始化] Casbin成功")
 }
 
 func mysqlCasbin() (e *casbin.Enforcer, err error) {

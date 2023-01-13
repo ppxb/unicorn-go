@@ -20,7 +20,7 @@ var sqlFs embed.FS
 func Mysql() {
 	cfg, err := m.ParseDSN(global.Config.Mysql.Uri)
 	if err != nil {
-		panic(errors.Wrap(err, "初始化Mysql失败"))
+		panic(errors.Wrap(err, "[初始化] Mysql失败"))
 	}
 	global.Config.Mysql.DSN = *cfg
 
@@ -35,7 +35,7 @@ func Mysql() {
 		panic(errors.Wrap(err, "初始化Mysql失败"))
 	}
 
-	fmt.Println("初始化Mysql成功")
+	fmt.Println("[初始化] Mysql成功")
 }
 
 func beforeMigrate(ctx context.Context) (err error) {
@@ -50,7 +50,7 @@ func beforeMigrate(ctx context.Context) (err error) {
 			select {
 			case <-ctx.Done():
 				if !init {
-					panic(fmt.Sprintf("initialize mysql failed: connect timeout(%ds", global.Config.Server.ConnectTimeout))
+					panic(fmt.Sprintf("[初始化] Mysql失败: 连接超时(%ds", global.Config.Server.ConnectTimeout))
 				}
 				// avoid goroutine deadlock
 				return
