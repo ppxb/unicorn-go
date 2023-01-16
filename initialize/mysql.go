@@ -25,7 +25,7 @@ func Mysql() {
 	global.Config.Mysql.DSN = *cfg
 
 	err = migrate.WithHooks(
-		migrate.WithCtx(ctx),
+		migrate.WithContext(ctx),
 		migrate.WithUri(global.Config.Mysql.Uri),
 		migrate.WithFs(sqlFs),
 		migrate.WithFsRoot("db"),

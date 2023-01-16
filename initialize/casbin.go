@@ -44,6 +44,5 @@ func mysqlCasbin() (e *casbin.Enforcer, err error) {
 	if err != nil {
 		return
 	}
-
 	return
 }

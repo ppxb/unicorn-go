@@ -17,8 +17,8 @@ type Options struct {
 	fsRoot      string
 }
 
-// WithCtx set datasource global context
-func WithCtx(ctx context.Context) func(*Options) {
+// WithContext WithCtx set datasource global context
+func WithContext(ctx context.Context) func(*Options) {
 	return func(options *Options) {
 		if !utils.InterfaceIsNil(ctx) {
 			getOptionsOrSetDefault(options).ctx = ctx

@@ -1,4 +1,4 @@
-package model
+package models
 
 import (
 	"context"
@@ -31,6 +31,5 @@ func (c ConfBox) Get(filename string) (bs []byte) {
 			fmt.Printf("read file %s from embed failed \n", f)
 		}
 	}
-
 	return
 }

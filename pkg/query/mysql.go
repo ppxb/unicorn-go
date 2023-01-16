@@ -2,6 +2,7 @@ package query
 
 import (
 	"context"
+	"github.com/ppxb/unicorn/pkg/utils"
 	"gorm.io/gorm"
 	"reflect"
 )
@@ -23,9 +24,15 @@ func NewMysql(options ...func(*MysqlOptions)) Mysql {
 	}
 	my := Mysql{
 		Db:  ops.db.WithContext(context.Background()),
+		Tx:  getTx(ops.db, *ops),
 		ops: *ops,
 	}
 	return my
+}
+
+func getTx(db *gorm.DB, ops MysqlOptions) *gorm.DB {
+	tx := db
+	return tx
 }
 
 func (m Mysql) Create(r interface{}, model interface{}) (err error) {
@@ -44,5 +51,6 @@ func (m Mysql) Create(r interface{}, model interface{}) (err error) {
 		}
 	}
 	utils.Struct2StructByJson(r, i)
+	err = m.Tx.Create(i).Error
 	return
 }

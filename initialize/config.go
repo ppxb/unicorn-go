@@ -8,7 +8,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
 	"github.com/ppxb/unicorn/pkg/global"
-	"github.com/ppxb/unicorn/pkg/model"
+	"github.com/ppxb/unicorn/pkg/models"
 	"github.com/spf13/viper"
 	"strings"
 )
@@ -26,7 +26,7 @@ var ctx context.Context
 
 func Config(c context.Context, conf embed.FS) {
 	var configFile string
-	var box model.ConfBox
+	var box models.ConfBox
 
 	ctx = c
 	box.Ctx = ctx
@@ -69,7 +69,7 @@ func Config(c context.Context, conf embed.FS) {
 	fmt.Println("[初始化] Config成功")
 }
 
-func readConfig(box model.ConfBox, v *viper.Viper, configFile string) {
+func readConfig(box models.ConfBox, v *viper.Viper, configFile string) {
 	v.SetConfigType(configType)
 	config := box.Get(configFile)
 	if len(config) == 0 {
