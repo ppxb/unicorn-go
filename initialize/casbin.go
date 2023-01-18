@@ -1,12 +1,12 @@
 package initialize
 
 import (
-	"fmt"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
 	"github.com/pkg/errors"
 	"github.com/ppxb/unicorn/pkg/global"
+	"github.com/zeromicro/go-zero/core/logx"
 )
 
 func CasbinEnforcer() {
@@ -15,7 +15,7 @@ func CasbinEnforcer() {
 		panic(errors.Wrap(err, "[初始化] Casbin Enforcer失败"))
 	}
 	global.CasbinEnforcer = e
-	fmt.Println("[初始化] Casbin成功")
+	logx.WithContext(ctx).Info("[初始化] Casbin初始化成功")
 }
 
 func mysqlCasbin() (e *casbin.Enforcer, err error) {

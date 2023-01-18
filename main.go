@@ -3,12 +3,13 @@ package main
 import (
 	"context"
 	"embed"
-	"fmt"
 	"github.com/ppxb/unicorn/initialize"
 	"github.com/ppxb/unicorn/pkg/global"
 	"github.com/ppxb/unicorn/pkg/server"
 	"github.com/ppxb/unicorn/router"
+	"github.com/zeromicro/go-zero/core/logx"
 	"runtime"
+	"runtime/debug"
 	"strings"
 )
 
@@ -20,7 +21,7 @@ var ctx = context.Background()
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
-			fmt.Println(err)
+			logx.WithContext(ctx).Errorf("[服务器] 启动失败，堆栈信息：%s", string(debug.Stack()))
 		}
 	}()
 

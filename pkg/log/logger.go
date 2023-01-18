@@ -24,16 +24,16 @@ type Interface interface {
 	Logf(level Level, format string, v ...interface{})
 }
 
-type config struct {
+type Config struct {
 	ops  Options
 	gorm logger.Config
 }
 
-func New(options ...func(*Options)) (l Interface) {
+func New(options ...func(*Options)) Interface {
 	ops := getOptionsOrSetDefault(nil)
 	for _, f := range options {
 		f(ops)
 	}
-	l = newZap(ops)
-	return
+	l := newZap(ops)
+	return l
 }

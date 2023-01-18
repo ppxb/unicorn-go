@@ -47,6 +47,7 @@ func getOptionsOrSetDefault(options *Options) *Options {
 			lineNum:        true,
 			lineNumLevel:   1,
 			lineNumVersion: true,
+			json:           true,
 		}
 	}
 	return options
