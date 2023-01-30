@@ -7,6 +7,7 @@ import (
 	m "github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
 	"github.com/ppxb/unicorn/pkg/global"
+	"github.com/ppxb/unicorn/pkg/log"
 	"github.com/ppxb/unicorn/pkg/migrate"
 	"gorm.io/driver/mysql"
 	"gorm.io/gorm"
@@ -20,7 +21,7 @@ var sqlFs embed.FS
 func Mysql() {
 	cfg, err := m.ParseDSN(global.Config.Mysql.Uri)
 	if err != nil {
-		panic(errors.Wrap(err, "[初始化] Mysql失败"))
+		panic(errors.Wrap(err, "mysql initialize failed"))
 	}
 	global.Config.Mysql.DSN = *cfg
 
@@ -32,10 +33,10 @@ func Mysql() {
 		migrate.WithBefore(beforeMigrate),
 	)
 	if err != nil {
-		panic(errors.Wrap(err, "初始化Mysql失败"))
+		panic(errors.Wrap(err, "mysql initialize failed"))
 	}
 
-	fmt.Println("[初始化] Mysql成功")
+	log.Info("mysql initialize success")
 }
 
 func beforeMigrate(ctx context.Context) (err error) {
@@ -50,7 +51,7 @@ func beforeMigrate(ctx context.Context) (err error) {
 			select {
 			case <-ctx.Done():
 				if !init {
-					panic(fmt.Sprintf("[初始化] Mysql失败: 连接超时(%ds", global.Config.Server.ConnectTimeout))
+					panic(fmt.Sprintf("mysql initialize failed, connect timeout (%ds", global.Config.Server.ConnectTimeout))
 				}
 				// avoid goroutine deadlock
 				return

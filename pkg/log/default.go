@@ -12,3 +12,7 @@ func init() {
 func Info(msg string) {
 	DefaultLogger.Info(msg)
 }
+
+func Error(msg string) {
+	DefaultLogger.Error(msg)
+}

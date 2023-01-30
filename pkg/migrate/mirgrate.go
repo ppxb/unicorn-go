@@ -5,6 +5,7 @@ import (
 	"fmt"
 	m "github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
+	"github.com/ppxb/unicorn/pkg/log"
 	migrate "github.com/rubenv/sql-migrate"
 )
 
@@ -22,7 +23,7 @@ func WithHooks(options ...func(*Options)) (err error) {
 	var db *sql.DB
 	db, err = sql.Open(ops.driver, ops.uri)
 	if err != nil {
-		fmt.Println(errors.Wrap(err, "[数据库] 打开数据库连接失败"))
+		fmt.Println(errors.Wrap(err, "open mysql failed"))
 		return
 	}
 
@@ -42,14 +43,14 @@ func WithHooks(options ...func(*Options)) (err error) {
 		if lockAcquired {
 			break
 		} else {
-			fmt.Println("[数据库] 无法获得锁，正在重试")
+			log.Error("mysql can't acquire lock,retrying...")
 		}
 	}
 
 	if ops.before != nil {
 		err = ops.before(ops.ctx)
 		if err != nil {
-			fmt.Println(errors.Wrap(err, "[数据库] 执行before hook失败"))
+			fmt.Println(errors.Wrap(err, "execute mysql before hook failed"))
 			return
 		}
 	}
@@ -61,17 +62,14 @@ func WithHooks(options ...func(*Options)) (err error) {
 	}
 	err = status(ops, db, source)
 	if err != nil {
-		fmt.Println("[数据库] 显示迁移状态失败")
 		return
 	}
 
 	_, err = migrate.Exec(db, ops.driver, source, migrate.Up)
 	if err != nil {
-		fmt.Println("[数据库] 迁移失败")
+		log.Error("mysql migrate failed")
 		return
 	}
-
-	fmt.Println("[数据库] 迁移成功")
 	return
 }
 
@@ -81,7 +79,7 @@ func database(ops *Options) (err error) {
 
 	cfg, err = m.ParseDSN(ops.uri)
 	if err != nil {
-		fmt.Println(errors.Wrap(err, "[数据库] 无效的数据库uri"))
+		fmt.Println(errors.Wrap(err, "invalid mysql uri"))
 		return
 	}
 
@@ -94,7 +92,7 @@ func database(ops *Options) (err error) {
 
 	_, err = db.Exec(fmt.Sprintf("CREATE DATABASE IF NOT EXISTS %s", dbname))
 	if err != nil {
-		fmt.Println(errors.Wrap(err, "[数据库] 创建数据库失败"))
+		fmt.Println(errors.Wrap(err, "create mysql database failed"))
 	}
 	return
 }
@@ -104,11 +102,9 @@ func releaseLock(ops *Options, db *sql.DB) (err error) {
 	_, err = db.Exec(q)
 
 	if err != nil {
-		fmt.Println("[数据库] 锁释放失败")
+		log.Error("release mysql lock failed")
 		return
 	}
-
-	fmt.Println("[数据库] 锁释放成功")
 	return
 }
 
@@ -117,9 +113,8 @@ func acquireLock(ops *Options, db *sql.DB) (f bool, err error) {
 	err = db.QueryRow(q).Scan(&f)
 
 	if err != nil {
-		fmt.Println("[数据库] 申请互斥锁失败")
+		log.Error("mysql acquire lock failed")
 	}
-	fmt.Println("[数据库] 申请互斥锁成功")
 	return
 }
 
@@ -127,14 +122,14 @@ func status(ops *Options, db *sql.DB, source *migrate.EmbedFileSystemMigrationSo
 	var migrations []*migrate.Migration
 	migrations, err = source.FindMigrations()
 	if err != nil {
-		fmt.Println("[数据库] 没有找到数据库迁移文件")
+		log.Error("can't find migrate files")
 		return
 	}
 
 	var records []*migrate.MigrationRecord
 	records, err = migrate.GetMigrationRecords(db, ops.driver)
 	if err != nil {
-		fmt.Println("[数据库] 没有找到数据库迁移历史")
+		log.Error("can't find migrate history")
 		return
 	}
 	rows := make(map[string]bool)
@@ -155,7 +150,5 @@ func status(ops *Options, db *sql.DB, source *migrate.EmbedFileSystemMigrationSo
 			applied = append(applied, migrations[i].Id)
 		}
 	}
-
-	fmt.Printf("[数据库] 迁移状态：等待中 %d，已成功 %d \n", len(pending), len(applied))
 	return
 }
