@@ -46,6 +46,21 @@ func InitRouter(ctx context.Context) *gin.Engine {
 	InitUserRouter(nr)
 
 	fmt.Println("[初始化] Router成功")
-
 	return r
+}
+
+func (r Router) Group(path string) gin.IRoutes {
+	router := r.ops.group.Group(path)
+	return router
+}
+
+func (r Router) Casbin(path string) gin.IRoutes {
+	router := r.Group(path)
+	if r.ops.jwt {
+		router.Use()
+	}
+	if r.ops.casbin {
+		router.Use(middleware.Casbin(r.ops.casbinOps...))
+	}
+	return router
 }

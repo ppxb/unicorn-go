@@ -3,7 +3,7 @@ package global
 import (
 	"github.com/casbin/casbin/v2"
 	"github.com/go-redis/redis/v8"
-	"github.com/ppxb/unicorn/pkg/models"
+	"github.com/ppxb/unicorn/models"
 	"gorm.io/gorm"
 )
 

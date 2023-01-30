@@ -5,10 +5,10 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"github.com/gin-gonic/gin"
 	"github.com/pkg/errors"
+	"github.com/ppxb/unicorn/models"
 	"github.com/ppxb/unicorn/pkg/global"
-	"github.com/ppxb/unicorn/pkg/models"
+	"github.com/ppxb/unicorn/pkg/log"
 	"github.com/spf13/viper"
 	"strings"
 )
@@ -16,31 +16,18 @@ import (
 const (
 	configType            = "yaml"
 	configDir             = "conf"
-	debugConfig           = "config.debug.yml"
-	testConfig            = "config.test.yml"
-	releaseConfig         = "config.release.yml"
+	configFile            = "config.yml"
 	defaultConnectTimeout = 5
 )
 
 var ctx context.Context
 
 func Config(c context.Context, conf embed.FS) {
-	var configFile string
-	var box models.ConfBox
-
 	ctx = c
-	box.Ctx = ctx
-	box.Fs = conf
-	box.Dir = configDir
-	global.ConfBox = box
-
-	switch gin.Mode() {
-	case gin.TestMode:
-		configFile = testConfig
-	case gin.ReleaseMode:
-		configFile = releaseConfig
-	default:
-		configFile = debugConfig
+	box := models.ConfBox{
+		Ctx: c,
+		Fs:  conf,
+		Dir: configDir,
 	}
 
 	v := viper.New()
@@ -66,7 +53,7 @@ func Config(c context.Context, conf embed.FS) {
 		global.Config.Server.ApiVersion = "v1"
 	}
 
-	fmt.Println("[初始化] Config成功")
+	log.Info("config initialize success")
 }
 
 func readConfig(box models.ConfBox, v *viper.Viper, configFile string) {

@@ -3,8 +3,8 @@ package v1
 import (
 	"fmt"
 	"github.com/gin-gonic/gin"
+	"github.com/ppxb/unicorn/models"
 	"github.com/ppxb/unicorn/pkg/dto"
-	"github.com/ppxb/unicorn/pkg/models"
 	"github.com/ppxb/unicorn/pkg/service"
 	"github.com/ppxb/unicorn/pkg/utils"
 )
