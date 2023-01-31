@@ -11,7 +11,6 @@ type Configuration struct {
 }
 
 type ServerConfiguration struct {
-	Host            string `mapstructure:"host" json:"host"`
 	Port            int    `mapstructure:"port" json:"port"`
 	ApiPrefix       string `mapstructure:"api-prefix" json:"apiPrefix"`
 	ApiVersion      string `mapstructure:"api-version" json:"apiVersion"`

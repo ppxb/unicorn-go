@@ -1,21 +1,22 @@
 package v1
 
 import (
+	"context"
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/ppxb/unicorn/models"
-	"github.com/ppxb/unicorn/pkg/dto"
-	"github.com/ppxb/unicorn/pkg/service"
-	"github.com/ppxb/unicorn/pkg/utils"
+	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/ppxb/unicorn/pkg/response"
 )
 
-func CreateUser(c *gin.Context) {
-	var r dto.CreateUser
-	dto.ShouldBind(c, &r)
-	my := service.New(c)
-	r.Password = utils.GenPwd(r.Password)
-	err := my.Q.Create(r, new(models.SysUser))
+type LoginReq struct {
+	Username string `json:"username" vd:"len($)>1"`
+	Password string `json:"password" vd:"len($)>1"`
+}
+
+func Login(ctx context.Context, c *app.RequestContext) {
+	var req LoginReq
+	err := c.BindAndValidate(&req)
 	if err != nil {
-		fmt.Println(err)
+		fmt.Println(err.Error())
 	}
+	response.Success(c)
 }

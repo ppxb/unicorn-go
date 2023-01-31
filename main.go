@@ -4,6 +4,7 @@ import (
 	"context"
 	"embed"
 	"github.com/ppxb/unicorn/initialize"
+	"github.com/ppxb/unicorn/pkg/http"
 )
 
 //go:embed conf
@@ -14,4 +15,6 @@ var ctx = context.Background()
 func main() {
 	initialize.Config(ctx, conf)
 	initialize.Mysql()
+
+	http.Listen()
 }

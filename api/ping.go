@@ -1,11 +1,12 @@
 package api
 
 import (
-	"github.com/gin-gonic/gin"
+	"context"
+	"github.com/cloudwego/hertz/pkg/app"
 	"net/http"
 )
 
-func Ping(c *gin.Context) {
+func Ping(ctx context.Context, c *app.RequestContext) {
 	c.JSON(http.StatusOK, map[string]string{
 		"ping": "pong",
 	})

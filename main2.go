@@ -20,10 +20,10 @@ package main
 //	initialize.Mysql()
 //	initialize.CasbinEnforcer()
 //
-//	server.Listen(
-//		server.WithHttpCtx(ctx),
-//		server.WithHttpHost(global.Config.Server.Host),
-//		server.WithHttpPort(global.Config.Server.Port),
-//		server.WithHttpHandler(router.InitRouter(ctx)),
+//	http.Listen(
+//		http.WithHttpCtx(ctx),
+//		http.WithHttpHost(global.Config.Server.Host),
+//		http.WithHttpPort(global.Config.Server.Port),
+//		http.WithHttpHandler(router.InitRouter(ctx)),
 //	)
 //}
