@@ -14,8 +14,9 @@ func Register(s *server.Hertz) {
 	middleware.InitJwt()
 
 	testGroup := apiGroup.Group("test")
-	testGroup.Use(middleware.JwtMiddleware.MiddlewareFunc())
+	testGroup.Use(middleware.JwtMiddleware.MiddlewareFunc()).Use(middleware.CasbinHandler())
 	testGroup.GET("/ping", api.Ping)
+
 	v1Group := apiGroup.Group(global.Config.Server.ApiVersion)
 
 	InitBaseRouter(v1Group)

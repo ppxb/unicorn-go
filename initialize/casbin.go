@@ -9,40 +9,47 @@ import (
 	"github.com/zeromicro/go-zero/core/logx"
 )
 
-func CasbinEnforcer() {
-	e, err := mysqlCasbin()
-	if err != nil {
-		panic(errors.Wrap(err, "[初始化] Casbin Enforcer失败"))
-	}
+func Casbin() {
+	e := mysqlCasbin()
 	global.CasbinEnforcer = e
 	logx.WithContext(ctx).Info("[初始化] Casbin初始化成功")
 }
 
-func mysqlCasbin() (e *casbin.Enforcer, err error) {
+func mysqlCasbin() *casbin.CachedEnforcer {
 	adapter, err := gormadapter.NewAdapterByDBUseTableName(
 		global.Mysql.WithContext(ctx),
 		global.Config.Mysql.TablePrefix,
 		"sys_casbin",
 	)
 	if err != nil {
-		return
+		panic(errors.Wrap(err, "[初始化] Casbin Enforcer失败"))
 	}
 
-	config := global.ConfBox.Get(global.Config.Server.CasbinModelPath)
-	casbinModel := model.NewModel()
-	err = casbinModel.LoadModelFromText(string(config))
+	text := `
+		[request_definition]
+		r = sub, obj, act
+		
+		[policy_definition]
+		p = sub, obj, act
+		
+		[role_definition]
+		g = _, _
+		
+		[policy_effect]
+		e = some(where (p.eft == allow))
+		
+		[matchers]
+		m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
+	`
+	m, _ := model.NewModelFromString(text)
+	enforcer, err := casbin.NewCachedEnforcer(m, adapter)
 	if err != nil {
-		return
+		panic(errors.Wrap(err, "[初始化] Casbin Enforcer失败"))
 	}
-
-	e, err = casbin.NewEnforcer(casbinModel, adapter)
+	enforcer.SetExpireTime(60 * 60)
+	err = enforcer.LoadPolicy()
 	if err != nil {
-		return
+		panic(errors.Wrap(err, "[初始化] Casbin Enforcer失败"))
 	}
-
-	err = e.LoadPolicy()
-	if err != nil {
-		return
-	}
-	return
+	return enforcer
 }

@@ -43,7 +43,7 @@ func InitJwt() {
 			if err := c.BindAndValidate(&loginReq); err != nil {
 				return nil, err
 			}
-			return &User{Username: "admin"}, nil
+			return &User{Username: loginReq.Username}, nil
 		},
 		IdentityKey: IdentityKey,
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {

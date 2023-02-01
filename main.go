@@ -15,6 +15,7 @@ var ctx = context.Background()
 func main() {
 	initialize.Config(ctx, conf)
 	initialize.Mysql()
+	initialize.Casbin()
 
 	http.Listen()
 }

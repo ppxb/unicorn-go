@@ -13,6 +13,6 @@ var (
 	Config         Configuration
 	ConfBox        models.ConfBox
 	Mysql          *gorm.DB
-	CasbinEnforcer *casbin.Enforcer
+	CasbinEnforcer *casbin.CachedEnforcer
 	Redis          redis.UniversalClient
 )
