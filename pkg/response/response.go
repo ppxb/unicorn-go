@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	OkCode    = 200001
-	ErrorCode = 400001
+	OkCode   = 200001
+	FailCode = 400001
 )
 
 type Response struct {
@@ -16,6 +16,13 @@ type Response struct {
 	Msg       string      `json:"msg"`
 	Data      interface{} `json:"data"`
 	Timestamp int64       `json:"timestamp"`
+}
+
+type Page struct {
+	List     interface{} `json:"list"`
+	Total    int64       `json:"total"`
+	Page     int         `json:"page"`
+	PageSize int         `json:"pageSize"`
 }
 
 func Result(code int, msg string, data interface{}, c *app.RequestContext) {
@@ -33,4 +40,20 @@ func Success(c *app.RequestContext) {
 
 func SuccessWithMsg(msg string, c *app.RequestContext) {
 	Result(OkCode, msg, nil, c)
+}
+
+func SuccessWithData(data interface{}, c *app.RequestContext) {
+	Result(OkCode, "success", data, c)
+}
+
+func Fail(c *app.RequestContext) {
+	Result(FailCode, "failed", nil, c)
+}
+
+func FailWithMsg(msg string, c *app.RequestContext) {
+	Result(FailCode, msg, nil, c)
+}
+
+func FailWithData(data interface{}, c *app.RequestContext) {
+	Result(FailCode, "failed", data, c)
 }
