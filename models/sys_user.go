@@ -23,16 +23,16 @@ func InitUsers(db *gorm.DB) {
 			UUID:     uuid.NewString(),
 			Mobile:   "110",
 			Password: utils.GenPwd("123"),
-			RoleId:   111,
+			RoleId:   1001,
 		},
 	}
 	if err := db.Create(&users); err != nil {
-		fmt.Println(err.Error)
+		fmt.Println(err)
 	}
 
 	if err := db.Model(&users[0]).Association("Roles").Replace(
 		[]*SysRole{
-			{RoleId: 111},
+			{RoleId: 1001},
 		}); err != nil {
 		fmt.Println("初始化关联失败")
 	}

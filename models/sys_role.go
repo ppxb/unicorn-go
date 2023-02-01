@@ -21,18 +21,17 @@ type SysRole struct {
 func InitRoles(db *gorm.DB) {
 	roles := []SysRole{
 		{
-
+			RoleId:   1001,
 			RoleName: "测试用户",
 			ParentId: 0,
+		},
+		{
+			RoleId:   10011,
+			RoleName: "测试用户子用户",
+			ParentId: 1001,
 		},
 	}
 	if err := db.Create(&roles); err != nil {
 		fmt.Println(err.Error)
-	}
-	if err := db.Model(&roles[0]).Association("DataRoleId").Replace(
-		[]*SysRole{
-			{RoleId: 111},
-		}); err != nil {
-		fmt.Println("初始化关联失败")
 	}
 }
