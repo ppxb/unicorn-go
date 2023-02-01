@@ -18,6 +18,8 @@ const (
 	configDir             = "conf"
 	configFile            = "config.yml"
 	defaultConnectTimeout = 5
+	defaultMaxIdleConns   = 10
+	defaultMaxOpenConns   = 100
 )
 
 var ctx context.Context
@@ -51,6 +53,14 @@ func Config(c context.Context, conf embed.FS) {
 
 	if strings.TrimSpace(global.Config.Server.ApiVersion) == "" {
 		global.Config.Server.ApiVersion = "v1"
+	}
+
+	if global.Config.Mysql.MaxIdleConns < 1 {
+		global.Config.Mysql.MaxIdleConns = defaultMaxIdleConns
+	}
+
+	if global.Config.Mysql.MaxOpenConns < 1 {
+		global.Config.Mysql.MaxOpenConns = defaultMaxOpenConns
 	}
 
 	log.Info("config initialize success")

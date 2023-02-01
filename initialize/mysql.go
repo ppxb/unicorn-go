@@ -6,6 +6,7 @@ import (
 	"fmt"
 	m "github.com/go-sql-driver/mysql"
 	"github.com/pkg/errors"
+	"github.com/ppxb/unicorn/models"
 	"github.com/ppxb/unicorn/pkg/global"
 	"github.com/ppxb/unicorn/pkg/log"
 	"github.com/ppxb/unicorn/pkg/migrate"
@@ -72,7 +73,23 @@ func beforeMigrate(ctx context.Context) (err error) {
 		return
 	}
 
+	sqlDb, _ := db.DB()
+	sqlDb.SetMaxIdleConns(global.Config.Mysql.MaxIdleConns)
+	sqlDb.SetMaxOpenConns(global.Config.Mysql.MaxOpenConns)
+
 	init = true
 	global.Mysql = db
+
+	err = db.AutoMigrate(
+		models.SysUser{},
+		models.SysRole{},
+	)
+	if err != nil {
+		return
+	}
+
+	models.InitUsers(db)
+	models.InitRoles(db)
+
 	return
 }
