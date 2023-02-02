@@ -1,0 +1,39 @@
+definitions:
+  response.Response:
+    properties:
+      code:
+        type: integer
+      data: {}
+      msg:
+        type: string
+      timestamp:
+        type: integer
+    type: object
+info:
+  contact: {}
+  description: A simple RBAC base framework built by go.
+  title: unicorn framework
+  version: 1.0.0
+paths:
+  /api/test/ping:
+    get:
+      consumes:
+      - application/json
+      description: Ping
+      produces:
+      - application/json
+      responses:
+        "20001":
+          description: ok
+          schema:
+            $ref: '#/definitions/response.Response'
+      security:
+      - Bearer: []
+      tags:
+      - Common
+securityDefinitions:
+  Bearer:
+    in: header
+    name: Authorization
+    type: apiKey
+swagger: "2.0"
