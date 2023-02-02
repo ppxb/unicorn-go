@@ -5,8 +5,6 @@ import (
 	"embed"
 	"fmt"
 	m "github.com/go-sql-driver/mysql"
-	"github.com/pkg/errors"
-	"github.com/ppxb/unicorn/models"
 	"github.com/ppxb/unicorn/pkg/global"
 	"github.com/ppxb/unicorn/pkg/log"
 	"github.com/ppxb/unicorn/pkg/migrate"
@@ -22,7 +20,7 @@ var sqlFs embed.FS
 func Mysql() {
 	cfg, err := m.ParseDSN(global.Config.Mysql.Uri)
 	if err != nil {
-		panic(errors.Wrap(err, "mysql initialize failed"))
+		log.Panic(fmt.Sprintf("Mysql 初始化失败：%s", err.Error()))
 	}
 	global.Config.Mysql.DSN = *cfg
 
@@ -34,13 +32,13 @@ func Mysql() {
 		migrate.WithBefore(beforeMigrate),
 	)
 	if err != nil {
-		panic(errors.Wrap(err, "mysql initialize failed"))
+		log.Panic(fmt.Sprintf("Mysql 初始化失败：%s", err.Error()))
 	}
 
-	log.Info("mysql initialize success")
+	log.Info("Mysql 初始化成功...")
 }
 
-func beforeMigrate(ctx context.Context) (err error) {
+func beforeMigrate(ctx context.Context) {
 	var cancel context.CancelFunc
 
 	init := false
@@ -52,7 +50,7 @@ func beforeMigrate(ctx context.Context) (err error) {
 			select {
 			case <-ctx.Done():
 				if !init {
-					panic(fmt.Sprintf("mysql initialize failed, connect timeout (%ds", global.Config.Server.ConnectTimeout))
+					log.Panic(fmt.Sprintf("Mysql 初始化失败，连接超时(%ds)", global.Config.Server.ConnectTimeout))
 				}
 				// avoid goroutine deadlock
 				return
@@ -60,8 +58,7 @@ func beforeMigrate(ctx context.Context) (err error) {
 		}
 	}()
 
-	var db *gorm.DB
-	db, err = gorm.Open(mysql.Open(global.Config.Mysql.DSN.FormatDSN()), &gorm.Config{
+	db, err := gorm.Open(mysql.Open(global.Config.Mysql.DSN.FormatDSN()), &gorm.Config{
 		DisableForeignKeyConstraintWhenMigrating: true,
 		NamingStrategy: schema.NamingStrategy{
 			TablePrefix:   global.Config.Mysql.TablePrefix + "_",
@@ -70,7 +67,7 @@ func beforeMigrate(ctx context.Context) (err error) {
 		QueryFields: true,
 	})
 	if err != nil {
-		return
+		log.Panic(fmt.Sprintf("Mysql 初始化失败：%s", err.Error()))
 	}
 
 	sqlDb, _ := db.DB()
@@ -79,17 +76,4 @@ func beforeMigrate(ctx context.Context) (err error) {
 
 	init = true
 	global.Mysql = db
-
-	err = db.AutoMigrate(
-		models.SysUser{},
-		models.SysRole{},
-	)
-	if err != nil {
-		return
-	}
-
-	models.InitUsers(db)
-	models.InitRoles(db)
-
-	return
 }

@@ -1,6 +1,7 @@
 package router
 
 import (
+	"github.com/cloudwego/hertz/pkg/app/middlewares/server/recovery"
 	"github.com/cloudwego/hertz/pkg/app/server"
 	"github.com/hertz-contrib/swagger"
 	"github.com/ppxb/unicorn/api"
@@ -12,10 +13,11 @@ import (
 
 func Register(s *server.Hertz) {
 	apiGroup := s.Group(global.Config.Server.ApiPrefix)
-	//apiGroup.GET("/ping", api.Ping)
+	apiGroup.GET("/ping", api.Ping)
 
 	middleware.InitJwt()
 
+	s.Use(recovery.Recovery())
 	s.GET("/swagger/*any",
 		swagger.WrapHandler(swaggerFiles.Handler,
 			swagger.URL("http://localhost:8848/swagger/doc.json"),
@@ -23,11 +25,11 @@ func Register(s *server.Hertz) {
 		),
 	)
 
-	testGroup := apiGroup.Group("test")
-	testGroup.Use(middleware.JwtMiddleware.MiddlewareFunc()).Use(middleware.CasbinHandler())
-	testGroup.GET("/ping", api.Ping)
-
 	v1Group := apiGroup.Group(global.Config.Server.ApiVersion)
+	v1Group.
+		Use(middleware.JwtMiddleware.MiddlewareFunc()).
+		Use(middleware.CasbinHandler())
 
-	InitBaseRouter(v1Group)
+	InitBaseRouter(apiGroup)
+	InitUserRouter(v1Group)
 }

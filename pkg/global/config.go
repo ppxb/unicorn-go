@@ -11,11 +11,10 @@ type Configuration struct {
 }
 
 type ServerConfiguration struct {
-	Port            int    `mapstructure:"port" json:"port"`
-	ApiPrefix       string `mapstructure:"api-prefix" json:"apiPrefix"`
-	ApiVersion      string `mapstructure:"api-version" json:"apiVersion"`
-	ConnectTimeout  int    `mapstructure:"connect-timeout" json:"connectTimeout"`
-	CasbinModelPath string `mapstructure:"casbin-model-path" json:"casbinModelPath"`
+	Port           int    `mapstructure:"port" json:"port"`
+	ApiPrefix      string `mapstructure:"api-prefix" json:"apiPrefix"`
+	ApiVersion     string `mapstructure:"api-version" json:"apiVersion"`
+	ConnectTimeout int    `mapstructure:"connect-timeout" json:"connectTimeout"`
 }
 
 type MysqlConfiguration struct {

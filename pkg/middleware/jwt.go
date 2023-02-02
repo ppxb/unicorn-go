@@ -5,7 +5,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hertz-contrib/jwt"
-	"net/http"
+	"github.com/ppxb/unicorn/pkg/resp"
 	"time"
 )
 
@@ -28,12 +28,10 @@ func InitJwt() {
 		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
 		TokenHeadName: "Bearer",
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
-			c.JSON(http.StatusOK, map[string]interface{}{
-				"code":    code,
-				"token":   token,
-				"expire":  expire,
-				"message": "success",
-			})
+			resp.SuccessWithData(map[string]interface{}{
+				"token":  token,
+				"expire": expire,
+			}, c)
 		},
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
 			var loginReq struct {
@@ -65,11 +63,7 @@ func InitJwt() {
 			return e.Error()
 		},
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
-			// 未携带token或token失效的返回值
-			c.JSON(http.StatusUnauthorized, map[string]interface{}{
-				"code":    400001,
-				"message": "token失效或未携带token",
-			})
+			resp.FailWithMsg("token失效或未携带token", c)
 		},
 	})
 	if err != nil {

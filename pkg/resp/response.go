@@ -1,4 +1,4 @@
-package response
+package resp
 
 import (
 	"github.com/cloudwego/hertz/pkg/app"

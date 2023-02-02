@@ -11,7 +11,7 @@ type Options struct {
 	driver      string
 	uri         string
 	lockName    string
-	before      func(ctx context.Context) error
+	before      func(ctx context.Context)
 	changeTable string
 	fs          embed.FS
 	fsRoot      string
@@ -54,7 +54,7 @@ func WithUri(s string) func(*Options) {
 }
 
 // WithBefore set database migrate before hook
-func WithBefore(f func(ctx context.Context) error) func(*Options) {
+func WithBefore(f func(ctx context.Context)) func(*Options) {
 	return func(options *Options) {
 		getOptionsOrSetDefault(options).before = f
 	}

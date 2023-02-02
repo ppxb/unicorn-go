@@ -1,18 +1,18 @@
 package initialize
 
 import (
+	"fmt"
 	"github.com/casbin/casbin/v2"
 	"github.com/casbin/casbin/v2/model"
 	gormadapter "github.com/casbin/gorm-adapter/v3"
-	"github.com/pkg/errors"
 	"github.com/ppxb/unicorn/pkg/global"
-	"github.com/zeromicro/go-zero/core/logx"
+	"github.com/ppxb/unicorn/pkg/log"
 )
 
 func Casbin() {
 	e := mysqlCasbin()
 	global.CasbinEnforcer = e
-	logx.WithContext(ctx).Info("[初始化] Casbin初始化成功")
+	log.Info("Casbin 初始化成功...")
 }
 
 func mysqlCasbin() *casbin.CachedEnforcer {
@@ -22,7 +22,7 @@ func mysqlCasbin() *casbin.CachedEnforcer {
 		"sys_casbin",
 	)
 	if err != nil {
-		panic(errors.Wrap(err, "[初始化] Casbin Enforcer失败"))
+		log.Panic(fmt.Sprintf("Casbin 初始化失败：%s", err.Error()))
 	}
 
 	text := `
@@ -44,12 +44,12 @@ func mysqlCasbin() *casbin.CachedEnforcer {
 	m, _ := model.NewModelFromString(text)
 	enforcer, err := casbin.NewCachedEnforcer(m, adapter)
 	if err != nil {
-		panic(errors.Wrap(err, "[初始化] Casbin Enforcer失败"))
+		log.Panic(fmt.Sprintf("Casbin 初始化失败：%s", err.Error()))
 	}
 	enforcer.SetExpireTime(60 * 60)
 	err = enforcer.LoadPolicy()
 	if err != nil {
-		panic(errors.Wrap(err, "[初始化] Casbin Enforcer失败"))
+		log.Panic(fmt.Sprintf("Casbin 初始化失败：%s", err.Error()))
 	}
 	return enforcer
 }

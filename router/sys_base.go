@@ -7,6 +7,5 @@ import (
 
 func InitBaseRouter(r *route.RouterGroup) {
 	router := r.Group("")
-	//router.POST("login", v1.Login)
 	router.POST("/login", middleware.JwtMiddleware.LoginHandler)
 }

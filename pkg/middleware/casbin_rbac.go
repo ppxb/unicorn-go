@@ -4,7 +4,7 @@ import (
 	"context"
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/ppxb/unicorn/pkg/global"
-	"github.com/ppxb/unicorn/pkg/response"
+	"github.com/ppxb/unicorn/pkg/resp"
 )
 
 func CasbinHandler() app.HandlerFunc {
@@ -14,7 +14,7 @@ func CasbinHandler() app.HandlerFunc {
 		act := string(c.Request.Method())
 		sub := user.(*User).Username
 		if ok, _ := global.CasbinEnforcer.Enforce(sub, obj, act); !ok {
-			response.SuccessWithMsg("权限不足", c)
+			resp.SuccessWithMsg("权限不足", c)
 			c.Abort()
 			return
 		}

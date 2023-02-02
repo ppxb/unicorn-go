@@ -5,7 +5,6 @@ import (
 	"context"
 	"embed"
 	"fmt"
-	"github.com/pkg/errors"
 	"github.com/ppxb/unicorn/models"
 	"github.com/ppxb/unicorn/pkg/global"
 	"github.com/ppxb/unicorn/pkg/log"
@@ -40,7 +39,7 @@ func Config(c context.Context, conf embed.FS) {
 	}
 
 	if err := v.Unmarshal(&global.Config); err != nil {
-		panic(errors.Wrapf(err, "初始化Config失败"))
+		log.Panic(fmt.Sprintf("Config 初始化失败：%s", err.Error()))
 	}
 
 	if global.Config.Server.ConnectTimeout < 1 {
@@ -63,16 +62,16 @@ func Config(c context.Context, conf embed.FS) {
 		global.Config.Mysql.MaxOpenConns = defaultMaxOpenConns
 	}
 
-	log.Info("config initialize success")
+	log.Info("Config 初始化成功...")
 }
 
 func readConfig(box models.ConfBox, v *viper.Viper, configFile string) {
 	v.SetConfigType(configType)
 	config := box.Get(configFile)
 	if len(config) == 0 {
-		panic(fmt.Sprintf("初始化Config失败, 配置文件路径：%s", box.Dir))
+		log.Panic(fmt.Sprintf("Config 初始化失败, 配置文件未找到，路径：%s", box.Dir))
 	}
 	if err := v.ReadConfig(bytes.NewReader(config)); err != nil {
-		panic(errors.Wrapf(err, "初始化Config失败, 配置文件路径：%s`", box.Dir))
+		log.Panic(fmt.Sprintf("Config 初始化失败, 配置文件未找到，路径：%s", box.Dir))
 	}
 }

@@ -1,5 +1,7 @@
 definitions:
-  response.Response:
+  request.CreateUser:
+    type: object
+  resp.Response:
     properties:
       code:
         type: integer
@@ -10,8 +12,14 @@ definitions:
         type: integer
     type: object
 info:
-  contact: {}
+  contact:
+    name: ppxb
+    url: http://github.com/ppxb
   description: A simple RBAC base framework built by go.
+  license:
+    name: MIT
+    url: https://github.com/ppxb/unicorn-go/blob/master/LICENCE
+  termsOfService: http://swagger.io/terms/
   title: unicorn framework
   version: 1.0.0
 paths:
@@ -26,11 +34,34 @@ paths:
         "20001":
           description: ok
           schema:
-            $ref: '#/definitions/response.Response'
+            $ref: '#/definitions/resp.Response'
       security:
       - Bearer: []
       tags:
-      - Common
+      - 其他
+  /api/v1/user/create:
+    post:
+      consumes:
+      - application/json
+      description: 创建用户
+      parameters:
+      - description: params
+        in: body
+        name: params
+        required: true
+        schema:
+          $ref: '#/definitions/request.CreateUser'
+      produces:
+      - application/json
+      responses:
+        "20001":
+          description: ok
+          schema:
+            $ref: '#/definitions/resp.Response'
+      security:
+      - Bearer: []
+      tags:
+      - 用户
 securityDefinitions:
   Bearer:
     in: header

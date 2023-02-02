@@ -1,39 +1,19 @@
 package models
 
-import (
-	"fmt"
-	"github.com/google/uuid"
-	"github.com/ppxb/unicorn/pkg/utils"
-	"gorm.io/gorm"
-)
+import "github.com/golang-module/carbon/v2"
 
 type SysUser struct {
 	M
-	UUID     string    `gorm:"index;comment:用户UUID" json:"uuid"`
-	Mobile   string    `gorm:"index:idx_mobile,unique;comment:用户手机号" json:"mobile"`
-	Password string    `gorm:"comment:用户密码" json:"password"`
-	RoleId   uint      `gorm:"comment:角色ID" json:"roleId"`
-	Role     SysRole   `gorm:"foreignKey:RoleId;references:RoleId;comment:角色" json:"role"`
-	Roles    []SysRole `gorm:"many2many:sys_user_role" json:"roles"`
-}
-
-func InitUsers(db *gorm.DB) {
-	users := []SysUser{
-		{
-			UUID:     uuid.NewString(),
-			Mobile:   "110",
-			Password: utils.GenPwd("123"),
-			RoleId:   1001,
-		},
-	}
-	if err := db.Create(&users); err != nil {
-		fmt.Println(err)
-	}
-
-	if err := db.Model(&users[0]).Association("Roles").Replace(
-		[]*SysRole{
-			{RoleId: 1001},
-		}); err != nil {
-		fmt.Println("初始化关联失败")
-	}
+	UUID         string          `gorm:"index:idx_uuid;unique;comment:用户UUID" json:"uuid"`
+	Mobile       string          `gorm:"index:idx_mobile,unique;comment:用户手机号" json:"mobile"`
+	Password     string          `gorm:"comment:用户密码" json:"password"`
+	Name         string          `gorm:"comment:用户姓名" json:"name"`
+	Avatar       string          `gorm:"comment:用户头像" json:"avatar"`
+	Status       *uint           `gorm:"type:tinyint(1);default:1;comment:用户状态(0：禁用；1：正常)" json:"status"`
+	RoleId       uint            `gorm:"comment:角色ID" json:"roleId"`
+	Role         interface{}     `gorm:"foreignKey:RoleId" json:"role"`
+	LastLogin    carbon.DateTime `gorm:"comment:最后登录时间" json:"lastLogin"`
+	Locked       uint            `gorm:"type:tinyint(1);default:0;comment:锁定状态(0：未锁定；1：已锁定)" json:"locked"`
+	LockedExpire int64           `gorm:"comment:锁定时间" json:"lockedExpire"`
+	PassWrong    int             `gorm:"comment:密码错误次数" json:"passWrong"`
 }

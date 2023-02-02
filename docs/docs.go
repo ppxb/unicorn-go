@@ -9,7 +9,15 @@ const docTemplate = `{
     "info": {
         "description": "{{escape .Description}}",
         "title": "{{.Title}}",
-        "contact": {},
+        "termsOfService": "http://swagger.io/terms/",
+        "contact": {
+            "name": "ppxb",
+            "url": "http://github.com/ppxb"
+        },
+        "license": {
+            "name": "MIT",
+            "url": "https://github.com/ppxb/unicorn-go/blob/master/LICENCE"
+        },
         "version": "{{.Version}}"
     },
     "host": "{{.Host}}",
@@ -30,13 +38,51 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Common"
+                    "其他"
                 ],
                 "responses": {
                     "20001": {
                         "description": "ok",
                         "schema": {
-                            "$ref": "#/definitions/response.Response"
+                            "$ref": "#/definitions/resp.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/user/create": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "description": "创建用户",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户"
+                ],
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "params",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/request.CreateUser"
+                        }
+                    }
+                ],
+                "responses": {
+                    "20001": {
+                        "description": "ok",
+                        "schema": {
+                            "$ref": "#/definitions/resp.Response"
                         }
                     }
                 }
@@ -44,7 +90,10 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "response.Response": {
+        "request.CreateUser": {
+            "type": "object"
+        },
+        "resp.Response": {
             "type": "object",
             "properties": {
                 "code": {

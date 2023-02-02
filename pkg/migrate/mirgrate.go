@@ -48,11 +48,7 @@ func WithHooks(options ...func(*Options)) (err error) {
 	}
 
 	if ops.before != nil {
-		err = ops.before(ops.ctx)
-		if err != nil {
-			fmt.Println(errors.Wrap(err, "execute mysql before hook failed"))
-			return
-		}
+		ops.before(ops.ctx)
 	}
 
 	migrate.SetTable(ops.changeTable)
