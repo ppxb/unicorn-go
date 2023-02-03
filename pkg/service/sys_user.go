@@ -12,13 +12,11 @@ import (
 
 func CreateUser(r request.CreateUser) (err error) {
 	var u models.SysUser
-	err = global.Mysql.Where("mobile = ?", r.Mobile).First(&u).Error
-	if err != nil && errors.Is(err, gorm.ErrRecordNotFound) {
+	if errors.Is(global.Mysql.Where("mobile = ?", r.Mobile).First(&u).Error, gorm.ErrRecordNotFound) {
 		utils.Struct2StructByJson(r, &u)
 		u.Password = utils.GenPwd(r.Password)
 		u.UUID = uuid.NewString()
-		err = global.Mysql.Create(&u).Error
-		return
+		return global.Mysql.Create(&u).Error
 	}
 	return errors.New("用户已存在")
 }

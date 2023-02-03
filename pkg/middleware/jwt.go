@@ -2,10 +2,14 @@ package middleware
 
 import (
 	"context"
+	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/cloudwego/hertz/pkg/common/hlog"
 	"github.com/hertz-contrib/jwt"
+	"github.com/ppxb/unicorn/models"
+	"github.com/ppxb/unicorn/pkg/log"
+	"github.com/ppxb/unicorn/pkg/request"
 	"github.com/ppxb/unicorn/pkg/resp"
+	"github.com/ppxb/unicorn/pkg/service"
 	"time"
 )
 
@@ -23,8 +27,8 @@ func InitJwt() {
 	JwtMiddleware, err = jwt.New(&jwt.HertzJWTMiddleware{
 		Realm:         "test zone",
 		Key:           []byte("secret key"),
-		Timeout:       time.Hour,
-		MaxRefresh:    time.Hour,
+		Timeout:       2 * time.Hour,
+		MaxRefresh:    2 * time.Hour,
 		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
 		TokenHeadName: "Bearer",
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
@@ -34,39 +38,36 @@ func InitJwt() {
 			}, c)
 		},
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
-			var loginReq struct {
-				Username string `json:"username"`
-				Password string `json:"password"`
-			}
-			if err := c.BindAndValidate(&loginReq); err != nil {
+			var req request.Login
+			if err := c.BindAndValidate(&req); err != nil {
 				return nil, err
 			}
-			return &User{Username: loginReq.Username}, nil
+			return service.Login(req)
 		},
 		IdentityKey: IdentityKey,
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
-			return &User{
-				Username: claims[IdentityKey].(string),
+			return &models.SysUser{
+				Mobile: claims[IdentityKey].(string),
 			}
 		},
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*User); ok {
+			if v, ok := data.(*models.SysUser); ok {
 				return jwt.MapClaims{
-					IdentityKey: v.Username,
+					IdentityKey: v.Mobile,
 				}
 			}
 			return jwt.MapClaims{}
 		},
 		HTTPStatusMessageFunc: func(e error, ctx context.Context, c *app.RequestContext) string {
-			hlog.CtxErrorf(ctx, "jwt biz err = %+v", e.Error())
+			log.Error(fmt.Sprintf("jwt 错误:%+v", e.Error()))
 			return e.Error()
 		},
 		Unauthorized: func(ctx context.Context, c *app.RequestContext, code int, message string) {
-			resp.FailWithMsg("token失效或未携带token", c)
+			resp.FailWithMsg(message, c)
 		},
 	})
 	if err != nil {
-		panic(err)
+		log.Panic(err.Error())
 	}
 }
