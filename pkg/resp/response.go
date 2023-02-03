@@ -1,6 +1,7 @@
 package resp
 
 import (
+	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
 	"net/http"
 	"time"
@@ -56,4 +57,17 @@ func FailWithMsg(msg string, c *app.RequestContext) {
 
 func FailWithData(data interface{}, c *app.RequestContext) {
 	Result(FailCode, "failed", data, c)
+}
+
+func CheckError(format interface{}, c *app.RequestContext) {
+	var f string
+	switch format.(type) {
+	case string:
+		f = format.(string)
+	case error:
+		f = fmt.Sprintf("%v", format.(error))
+	}
+	if f != "" {
+		FailWithMsg(f, c)
+	}
 }

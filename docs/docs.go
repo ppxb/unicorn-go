@@ -91,7 +91,23 @@ const docTemplate = `{
     },
     "definitions": {
         "request.CreateUser": {
-            "type": "object"
+            "type": "object",
+            "properties": {
+                "mobile": {
+                    "type": "string",
+                    "example": "18111111111"
+                },
+                "name": {
+                    "type": "string",
+                    "example": "张三"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "roleId": {
+                    "type": "integer"
+                }
+            }
         },
         "resp.Response": {
             "type": "object",
@@ -124,8 +140,8 @@ var SwaggerInfo = &swag.Spec{
 	Host:             "",
 	BasePath:         "",
 	Schemes:          []string{},
-	Title:            "unicorn framework",
-	Description:      "A simple RBAC base framework built by go.",
+	Title:            "unicorn Framework",
+	Description:      "一个使用Go开发的RBAC基础框架",
 	InfoInstanceName: "swagger",
 	SwaggerTemplate:  docTemplate,
 }

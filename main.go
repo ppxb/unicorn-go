@@ -16,9 +16,9 @@ var conf embed.FS
 
 var ctx = context.Background()
 
-// @title unicorn framework
+// @title unicorn Framework
 // @version 1.0.0
-// @description A simple RBAC base framework built by go.
+// @description 一个使用Go开发的RBAC基础框架
 // @termsOfService  http://swagger.io/terms/
 
 // @contact.name ppxb

@@ -11,9 +11,9 @@ import (
 // @Accept json
 // @Produce json
 // @Success 20001 {object} resp.Response "ok"
-// @Tags 其他
+// @Tags 其他接口
 // @Description Ping
-// @Router /api/test/ping [GET]
+// @Router /api/ping [GET]
 func Ping(ctx context.Context, c *app.RequestContext) {
 	resp.SuccessWithData(map[string]interface{}{
 		"ping": "pong",
