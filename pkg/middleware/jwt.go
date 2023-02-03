@@ -9,7 +9,7 @@ import (
 	"github.com/ppxb/unicorn/pkg/log"
 	"github.com/ppxb/unicorn/pkg/request"
 	"github.com/ppxb/unicorn/pkg/resp"
-	"github.com/ppxb/unicorn/pkg/service"
+	"github.com/ppxb/unicorn/pkg/services"
 	"time"
 )
 
@@ -42,7 +42,7 @@ func InitJwt() {
 			if err := c.BindAndValidate(&req); err != nil {
 				return nil, err
 			}
-			return service.Login(req)
+			return services.Login(req)
 		},
 		IdentityKey: IdentityKey,
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {

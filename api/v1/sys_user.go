@@ -5,7 +5,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/ppxb/unicorn/pkg/request"
 	"github.com/ppxb/unicorn/pkg/resp"
-	"github.com/ppxb/unicorn/pkg/service"
+	"github.com/ppxb/unicorn/pkg/services"
 )
 
 // CreateUser 创建用户
@@ -24,7 +24,7 @@ func CreateUser(ctx context.Context, c *app.RequestContext) {
 		resp.FailWithMsg(err.Error(), c)
 		return
 	}
-	err = service.CreateUser(r)
+	err = services.CreateUser(r)
 	if err != nil {
 		resp.CheckError(err, c)
 		return

@@ -1,4 +1,4 @@
-package service
+package services
 
 import (
 	"github.com/pkg/errors"
@@ -9,11 +9,16 @@ import (
 	"gorm.io/gorm"
 )
 
-func Login(req request.Login) (u *models.SysUser, err error) {
+type BaseService interface {
+	Login(req request.Login) (*models.SysUser, error)
+}
+
+func Login(req request.Login) (*models.SysUser, error) {
+	var u *models.SysUser
 	if errors.Is(global.Mysql.Where("mobile = ?", req.Mobile).First(&u).Error, gorm.ErrRecordNotFound) {
 		return nil, errors.New("用户不存在")
 	}
-	if ok := utils.ComparePwd(req.Password, u.Password); !ok {
+	if err := utils.ComparePwd(u.Password, req.Password); err != nil {
 		return nil, errors.New("密码错误")
 	}
 	return u, nil
