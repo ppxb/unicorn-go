@@ -18,10 +18,6 @@ var (
 	IdentityKey   = "identity"
 )
 
-type User struct {
-	Username string `json:"username"`
-}
-
 func InitJwt() {
 	var err error
 	JwtMiddleware, err = jwt.New(&jwt.HertzJWTMiddleware{
