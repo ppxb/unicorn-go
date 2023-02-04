@@ -2,12 +2,14 @@ package global
 
 import (
 	"github.com/go-sql-driver/mysql"
+	"time"
 )
 
 type Configuration struct {
 	Server ServerConfiguration `mapstructure:"server" json:"server"`
 	Mysql  MysqlConfiguration  `mapstructure:"mysql" json:"mysql"`
 	Redis  RedisConfiguration  `mapstructure:"redis" json:"redis"`
+	Jwt    JwtConfiguration    `mapstructure:"jwt" json:"jwt"`
 }
 
 type ServerConfiguration struct {
@@ -28,4 +30,12 @@ type MysqlConfiguration struct {
 
 type RedisConfiguration struct {
 	Uri string `mapstructure:"uri" json:"uri"`
+}
+
+type JwtConfiguration struct {
+	Realm       string        `mapstructure:"realm" json:"realm"`
+	SecretKey   string        `mapstructure:"secret-key" json:"secretKey"`
+	Expire      time.Duration `mapstructure:"expire" json:"expire"`
+	Refresh     time.Duration `mapstructure:"refresh" json:"refresh"`
+	IdentityKey string        `mapstructure:"identity-key" json:"identityKey"`
 }

@@ -7,5 +7,12 @@ mysql:
   table-prefix: tb
   show-sql: true
 
+jwt:
+  realm: test
+  secret-key: unicorn
+  expire: 2
+  refresh: 2
+  identity-key: identity
+
 redis:
   uri: redis://127.0.0.1:6379

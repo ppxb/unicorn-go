@@ -6,6 +6,7 @@ import (
 	"github.com/cloudwego/hertz/pkg/app"
 	"github.com/hertz-contrib/jwt"
 	"github.com/ppxb/unicorn/models"
+	"github.com/ppxb/unicorn/pkg/global"
 	"github.com/ppxb/unicorn/pkg/log"
 	"github.com/ppxb/unicorn/pkg/request"
 	"github.com/ppxb/unicorn/pkg/resp"
@@ -15,19 +16,28 @@ import (
 
 var (
 	JwtMiddleware *jwt.HertzJWTMiddleware
-	IdentityKey   = "identity"
+	IdentityKey   = global.Config.Jwt.IdentityKey
+	BaseService   = &services.BaseServiceImpl{
+		Ctx: context.Background(),
+	}
 )
 
 func InitJwt() {
 	var err error
 	JwtMiddleware, err = jwt.New(&jwt.HertzJWTMiddleware{
-		Realm:         "test zone",
-		Key:           []byte("secret key"),
-		Timeout:       2 * time.Hour,
-		MaxRefresh:    2 * time.Hour,
+		Realm:         global.Config.Jwt.Realm,
+		Key:           []byte(global.Config.Jwt.SecretKey),
+		Timeout:       global.Config.Jwt.Expire * time.Hour,
+		MaxRefresh:    global.Config.Jwt.Refresh * time.Hour,
 		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
 		TokenHeadName: "Bearer",
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
+			resp.SuccessWithData(map[string]interface{}{
+				"token":  token,
+				"expire": expire,
+			}, c)
+		},
+		RefreshResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
 			resp.SuccessWithData(map[string]interface{}{
 				"token":  token,
 				"expire": expire,
@@ -38,7 +48,7 @@ func InitJwt() {
 			if err := c.BindAndValidate(&req); err != nil {
 				return nil, err
 			}
-			return services.Login(req)
+			return BaseService.Login(req)
 		},
 		IdentityKey: IdentityKey,
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
