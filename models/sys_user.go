@@ -24,4 +24,5 @@ type UserInfoResp struct {
 	Name      string          `json:"name"`
 	Avatar    string          `json:"avatar"`
 	LastLogin carbon.DateTime `json:"lastLogin"`
+	Role      SysRole         `json:"role"`
 }

@@ -15,7 +15,7 @@ func Casbin() {
 	log.Info("Casbin 初始化成功...")
 }
 
-func mysqlCasbin() *casbin.CachedEnforcer {
+func mysqlCasbin() *casbin.Enforcer {
 	adapter, err := gormadapter.NewAdapterByDBUseTableName(
 		global.Mysql.WithContext(ctx),
 		global.Config.Mysql.TablePrefix,
@@ -42,11 +42,10 @@ func mysqlCasbin() *casbin.CachedEnforcer {
 		m = g(r.sub, p.sub) && r.obj == p.obj && r.act == p.act
 	`
 	m, _ := model.NewModelFromString(text)
-	enforcer, err := casbin.NewCachedEnforcer(m, adapter)
+	enforcer, err := casbin.NewEnforcer(m, adapter)
 	if err != nil {
 		log.Panic(fmt.Sprintf("Casbin 初始化失败：%s", err.Error()))
 	}
-	enforcer.SetExpireTime(60 * 60)
 	err = enforcer.LoadPolicy()
 	if err != nil {
 		log.Panic(fmt.Sprintf("Casbin 初始化失败：%s", err.Error()))

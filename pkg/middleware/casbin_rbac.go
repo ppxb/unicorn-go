@@ -10,7 +10,7 @@ import (
 
 func CasbinHandler() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
-		user, _ := c.Get(IdentityKey)
+		user, _ := c.Get(global.Config.Jwt.IdentityKey)
 		obj := string(c.Request.URI().Path())
 		act := string(c.Request.Method())
 		sub := user.(*models.SysUser).Mobile

@@ -6,7 +6,7 @@ import (
 )
 
 func GetUserByMobile(mobile string) (user *models.SysUser, err error) {
-	if err = global.Mysql.Where("mobile = ?", mobile).First(&user).Error; err != nil {
+	if err = global.Mysql.Preload("Role").Where("mobile = ?", mobile).First(&user).Error; err != nil {
 		return nil, err
 	}
 	return user, nil

@@ -12,12 +12,12 @@ import (
 	"github.com/ppxb/unicorn/pkg/request"
 	"github.com/ppxb/unicorn/pkg/resp"
 	"github.com/ppxb/unicorn/pkg/services"
+	"github.com/ppxb/unicorn/pkg/utils"
 	"time"
 )
 
 var (
 	JwtMiddleware *jwt.HertzJWTMiddleware
-	IdentityKey   = global.Config.Jwt.IdentityKey
 	BaseService   = &services.BaseServiceImpl{
 		Ctx: context.Background(),
 	}
@@ -25,6 +25,7 @@ var (
 
 func InitJwt() {
 	var err error
+	IdentityKey := global.Config.Jwt.IdentityKey
 	JwtMiddleware, err = jwt.New(&jwt.HertzJWTMiddleware{
 		Realm:         global.Config.Jwt.Realm,
 		Key:           []byte(global.Config.Jwt.SecretKey),
@@ -33,7 +34,9 @@ func InitJwt() {
 		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
 		TokenHeadName: "Bearer",
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
+			user, _ := c.Get("userResp")
 			resp.SuccessWithData(map[string]interface{}{
+				"user":   user,
 				"token":  token,
 				"expire": expire,
 			}, c)
@@ -46,14 +49,14 @@ func InitJwt() {
 		},
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
 			var req request.Login
-
+			var userResp *models.UserInfoResp
 			if err = c.BindAndValidate(&req); err != nil {
 				return nil, err
 			}
-
-			user, _ := BaseService.Login(req)
-			fmt.Println(user)
-			return BaseService.Login(req)
+			user, err := BaseService.Login(req)
+			utils.Struct2StructByJson(user, &userResp)
+			c.Set("userResp", userResp)
+			return user, err
 		},
 		IdentityKey: IdentityKey,
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
@@ -68,7 +71,7 @@ func InitJwt() {
 					IdentityKey: v.Mobile,
 				}
 			}
-			return jwt.MapClaims{}
+			return make(jwt.MapClaims)
 		},
 		HTTPStatusMessageFunc: func(e error, ctx context.Context, c *app.RequestContext) string {
 			log.Error(fmt.Sprintf("JWT 解析错误: %+v", e.Error()))

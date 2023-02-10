@@ -12,7 +12,7 @@ jwt:
   secret-key: unicorn
   expire: 2
   refresh: 2
-  identity-key: identity
+  identity-key: jwt-identity
 
 redis:
   uri: redis://127.0.0.1:6379
