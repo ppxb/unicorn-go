@@ -17,3 +17,11 @@ type SysUser struct {
 	LockExpire int64           `gorm:"comment:锁定时间" json:"lockExpire"`
 	PassWrong  int             `gorm:"comment:密码错误次数" json:"passWrong"`
 }
+
+type UserInfoResp struct {
+	UUID      string          `json:"uuid"`
+	Mobile    string          `json:"mobile"`
+	Name      string          `json:"name"`
+	Avatar    string          `json:"avatar"`
+	LastLogin carbon.DateTime `json:"lastLogin"`
+}

@@ -8,4 +8,5 @@ import (
 func InitUserRouter(r *route.RouterGroup) {
 	router := r.Group("user")
 	router.POST("/create", v1.CreateUser)
+	router.GET("/info", v1.GetUserInfo)
 }
