@@ -2,12 +2,15 @@ package v1
 
 import (
 	"context"
-	"fmt"
 	"github.com/cloudwego/hertz/pkg/app"
+	"github.com/ppxb/unicorn/models"
 	"github.com/ppxb/unicorn/pkg/request"
 	"github.com/ppxb/unicorn/pkg/resp"
 	"github.com/ppxb/unicorn/pkg/services"
+	"github.com/ppxb/unicorn/pkg/utils"
 )
+
+var UserService = &services.UserServiceImpl{}
 
 // CreateUser 创建用户
 // @Security Bearer
@@ -42,13 +45,15 @@ func CreateUser(ctx context.Context, c *app.RequestContext) {
 // @Description 获得用户信息
 // @Router /api/v1/user/info [GET]
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
-	if uuid, ok := c.Get("JWT_PAYLOAD"); ok {
-		fmt.Println(uuid)
+	var rp models.UserInfoResp
+	user := UserService.GetUserInfo(c)
+	utils.Struct2StructByJson(user, &rp)
+	rp.RoleName = user.Role.Name
+	rp.Keyword = user.Role.Keyword
+	if user.Role.Sort != nil {
+		rp.RoleSort = *user.Role.Sort
+	} else {
+		rp.RoleSort = 999
 	}
-	err := services.GetUserInfo()
-	if err != nil {
-		resp.CheckError(err, c)
-		return
-	}
-	resp.Success(c)
+	resp.SuccessWithData(rp, c)
 }

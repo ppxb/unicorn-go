@@ -5,9 +5,23 @@ import (
 	"github.com/ppxb/unicorn/pkg/global"
 )
 
-func GetUserByMobile(mobile string) (user *models.SysUser, err error) {
-	if err = global.Mysql.Preload("Role").Where("mobile = ?", mobile).First(&user).Error; err != nil {
-		return nil, err
+func GetUserByMobile(mobile string) (u models.SysUser, err error) {
+	err = global.Mysql.
+		Where("mobile = ?", mobile).
+		Where("status = ?", models.SysUserStatusEnable).
+		First(&u).Error
+	return u, err
+}
+
+func GetUserByUUID(uuid string) (u models.SysUser) {
+	var newUser models.SysUser
+	err := global.Mysql.
+		Preload("Role").
+		Where("uuid = ?", uuid).
+		Where("status = ?", models.SysUserStatusEnable).
+		First(&u).Error
+	if err != nil {
+		return newUser
 	}
-	return user, nil
+	return u
 }

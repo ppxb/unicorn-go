@@ -3,22 +3,34 @@ package middleware
 import (
 	"context"
 	"github.com/cloudwego/hertz/pkg/app"
-	"github.com/ppxb/unicorn/models"
 	"github.com/ppxb/unicorn/pkg/global"
 	"github.com/ppxb/unicorn/pkg/resp"
+	"github.com/ppxb/unicorn/pkg/services"
+	"sync"
 )
+
+var userService = &services.UserServiceImpl{}
 
 func CasbinHandler() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
-		user, _ := c.Get(global.Config.Jwt.IdentityKey)
+		u := userService.GetUserInfo(c)
 		obj := string(c.Request.URI().Path())
 		act := string(c.Request.Method())
-		sub := user.(*models.SysUser).Mobile
-		if ok, _ := global.CasbinEnforcer.Enforce(sub, obj, act); !ok {
-			resp.SuccessWithMsg("权限不足", c)
+		sub := u.Role.Keyword
+		if !check(sub, obj, act) {
+			resp.SuccessWithMsg("没有该权限", c)
 			c.Abort()
 			return
 		}
 		c.Next(ctx)
 	}
+}
+
+var checkLock sync.Mutex
+
+func check(sub, obj, act string) bool {
+	checkLock.Lock()
+	defer checkLock.Unlock()
+	pass, _ := global.CasbinEnforcer.Enforce(sub, obj, act)
+	return pass
 }

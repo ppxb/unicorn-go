@@ -12,7 +12,6 @@ import (
 	"github.com/ppxb/unicorn/pkg/request"
 	"github.com/ppxb/unicorn/pkg/resp"
 	"github.com/ppxb/unicorn/pkg/services"
-	"github.com/ppxb/unicorn/pkg/utils"
 	"time"
 )
 
@@ -34,9 +33,7 @@ func InitJwt() {
 		TokenLookup:   "header: Authorization, query: token, cookie: jwt",
 		TokenHeadName: "Bearer",
 		LoginResponse: func(ctx context.Context, c *app.RequestContext, code int, token string, expire time.Time) {
-			user, _ := c.Get("userResp")
 			resp.SuccessWithData(map[string]interface{}{
-				"user":   user,
 				"token":  token,
 				"expire": expire,
 			}, c)
@@ -49,26 +46,22 @@ func InitJwt() {
 		},
 		Authenticator: func(ctx context.Context, c *app.RequestContext) (interface{}, error) {
 			var req request.Login
-			var userResp *models.UserInfoResp
 			if err = c.BindAndValidate(&req); err != nil {
 				return nil, err
 			}
-			user, err := BaseService.Login(req)
-			utils.Struct2StructByJson(user, &userResp)
-			c.Set("userResp", userResp)
-			return user, err
+			return BaseService.Login(req)
 		},
 		IdentityKey: IdentityKey,
 		IdentityHandler: func(ctx context.Context, c *app.RequestContext) interface{} {
 			claims := jwt.ExtractClaims(ctx, c)
 			return &models.SysUser{
-				Mobile: claims[IdentityKey].(string),
+				UUID: claims[IdentityKey].(string),
 			}
 		},
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*models.SysUser); ok {
+			if v, ok := data.(models.SysUser); ok {
 				return jwt.MapClaims{
-					IdentityKey: v.Mobile,
+					IdentityKey: v.UUID,
 				}
 			}
 			return make(jwt.MapClaims)

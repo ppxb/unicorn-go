@@ -2,6 +2,11 @@ package models
 
 import "github.com/golang-module/carbon/v2"
 
+const (
+	SysUserStatusEnable   = 0
+	SysUserStatusDisabled = 1
+)
+
 type SysUser struct {
 	M
 	UUID       string          `gorm:"index:idx_uuid;unique;comment:用户UUID" json:"uuid"`
@@ -24,5 +29,7 @@ type UserInfoResp struct {
 	Name      string          `json:"name"`
 	Avatar    string          `json:"avatar"`
 	LastLogin carbon.DateTime `json:"lastLogin"`
-	Role      SysRole         `json:"role"`
+	RoleName  string          `json:"roleName"`
+	RoleSort  uint            `json:"roleSort"`
+	Keyword   string          `json:"keyword"`
 }

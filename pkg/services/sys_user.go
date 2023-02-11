@@ -20,8 +20,3 @@ func CreateUser(r request.CreateUser) (err error) {
 	}
 	return errors.New("用户已存在")
 }
-
-func GetUserInfo() (err error) {
-
-	return nil
-}
