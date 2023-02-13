@@ -8,4 +8,5 @@ import (
 func InitMenuRouter(r *route.RouterGroup) {
 	router := r.Group("menu")
 	router.GET("/tree", v1.GetMenuTree)
+	router.GET("/list", v1.FindMenu)
 }

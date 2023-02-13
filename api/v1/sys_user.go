@@ -46,7 +46,7 @@ func CreateUser(ctx context.Context, c *app.RequestContext) {
 // @Router /api/v1/user/info [GET]
 func GetUserInfo(ctx context.Context, c *app.RequestContext) {
 	var rp models.UserInfoResp
-	user := UserService.GetUserInfo(c)
+	user := services.GetCurrentUser(c)
 	utils.Struct2StructByJson(user, &rp)
 	rp.RoleName = user.Role.Name
 	rp.Keyword = user.Role.Keyword

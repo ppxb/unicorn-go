@@ -11,11 +11,9 @@ import (
 	"sync"
 )
 
-var userService = &services.UserServiceImpl{}
-
 func CasbinHandler() app.HandlerFunc {
 	return func(ctx context.Context, c *app.RequestContext) {
-		u := userService.GetUserInfo(c)
+		u := services.GetCurrentUser(c)
 		obj := string(c.Request.URI().Path())
 		act := string(c.Request.Method())
 		sub := u.Role.Keyword

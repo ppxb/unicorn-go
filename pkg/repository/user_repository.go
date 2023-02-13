@@ -14,14 +14,14 @@ func GetUserByMobile(mobile string) (u models.SysUser, err error) {
 }
 
 func GetUserByUUID(uuid string) (u models.SysUser) {
-	var newUser models.SysUser
+	var nu models.SysUser
 	err := global.Mysql.
 		Preload("Role").
 		Where("uuid = ?", uuid).
 		Where("status = ?", models.SysUserStatusEnable).
 		First(&u).Error
 	if err != nil {
-		return newUser
+		return nu
 	}
 	return u
 }
