@@ -32,4 +32,5 @@ func Register(s *server.Hertz) {
 
 	InitBaseRouter(apiGroup)
 	InitUserRouter(v1Group)
+	InitMenuRouter(v1Group)
 }
